@@ -11,7 +11,9 @@
 
 ## daemon
 
-* golang 实现的应用后台启动工具，使用 ```https://github.com/sevlyar/go-daemon``` 封装。
+* golang服务中实现后台启动，并集成命令行实现服务安全退出和配置热重载示例。
+* [deamon](https://github.com/YuleiGong/luffy/tree/main/deamon "deamon")
 
 ## graceful-HTTP
+* 优雅退出HTTP服务。
 * [graceful-HTTP](https://github.com/YuleiGong/luffy/tree/main/graceful-HTTP "优雅退出http服务")

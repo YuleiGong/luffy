@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
+	"daemon/server"
 	"flag"
 	"log"
+	"net/http"
 	"os"
 	"syscall"
 	"time"
@@ -15,22 +18,26 @@ var (
   quit — graceful shutdown
   stop — fast shutdown
   reload — reloading the configuration file`)
+	stop = make(chan struct{})
 )
 
-func main() {
+func init() {
 	flag.Parse()
-	daemon.AddCommand(daemon.StringFlag(signal, "quit"), syscall.SIGQUIT, termHandler)
-	daemon.AddCommand(daemon.StringFlag(signal, "stop"), syscall.SIGTERM, termHandler)
+	daemon.AddCommand(daemon.StringFlag(signal, "quit"), syscall.SIGQUIT, stopHandler)
+	daemon.AddCommand(daemon.StringFlag(signal, "stop"), syscall.SIGTERM, stopHandler)
 	daemon.AddCommand(daemon.StringFlag(signal, "reload"), syscall.SIGHUP, reloadHandler)
 
+}
+
+func main() {
 	cntxt := &daemon.Context{
-		PidFileName: "sample.pid",
+		PidFileName: "server.pid",
 		PidFilePerm: 0644,
-		LogFileName: "sample.log",
+		LogFileName: "server.log",
 		LogFilePerm: 0640,
 		WorkDir:     "./",
 		Umask:       027,
-		Args:        []string{"[go-daemon sample]"},
+		Args:        []string{"[go-daemon server]"},
 	}
 
 	if len(daemon.ActiveFlags()) > 0 {
@@ -51,10 +58,15 @@ func main() {
 	}
 	defer cntxt.Release()
 
-	log.Println("- - - - - - - - - - - - - - -")
-	log.Println("daemon started")
+	log.Println("go-daemon server started")
 
-	go worker()
+	srv := server.InitServer()
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+	go stopHTTPServer(srv)
 
 	err = daemon.ServeSignals()
 	if err != nil {
@@ -63,31 +75,22 @@ func main() {
 
 	log.Println("daemon terminated")
 }
-
-var (
-	stop = make(chan struct{})
-	done = make(chan struct{})
-)
-
-func worker() {
-LOOP:
-	for {
-		time.Sleep(time.Second) // this is work to be done by worker.
-		select {
-		case <-stop:
-			break LOOP
-		default:
-		}
+func stopHTTPServer(srv *http.Server) {
+	<-stop
+	log.Println("stop http server")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server Shutdown:", err)
 	}
-	done <- struct{}{}
 }
 
-func termHandler(sig os.Signal) error {
-	log.Println("terminating...")
-	stop <- struct{}{}
-	if sig == syscall.SIGQUIT {
-		<-done
+func stopHandler(sig os.Signal) error {
+	if sig == syscall.SIGQUIT || sig == syscall.SIGTERM {
+		stop <- struct{}{}
 	}
+	log.Println("stop Handler")
+
 	return daemon.ErrStop
 }
 
