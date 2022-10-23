@@ -3,6 +3,7 @@
 * [前置](#前置)
 * [daemon](#daemon)
 * [graceful-HTTP](#graceful-HTTP)
+* [task-queue](#task-queue)
 
 ## 前置
 
@@ -17,3 +18,12 @@
 ## graceful-HTTP
 * 优雅退出HTTP服务。
 * [graceful-HTTP](https://github.com/YuleiGong/luffy/tree/main/graceful-HTTP "优雅退出http服务")
+
+## task-queue
+
+* golang 编码的类似 python __Celery__ 单节点异步任务队列。
+* 支持：
+    * 任务重试
+    * 设置任务超时
+    * 任务执行状态查询
+
