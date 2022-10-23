@@ -12,7 +12,7 @@
 ## daemon
 
 * golang服务中实现后台启动，并集成命令行实现服务安全退出和配置热重载示例。
-* [deamon](https://github.com/YuleiGong/luffy/tree/main/deamon "deamon")
+* [deamon](https://github.com/YuleiGong/luffy/tree/main/daemon "daemon")
 
 ## graceful-HTTP
 * 优雅退出HTTP服务。
