@@ -65,3 +65,10 @@ func WithShowStdOut(showStdOut bool) LoggerOpt {
 		l.showStdOut = showStdOut
 	}
 }
+
+//输出函数调用位置
+func WithReportCeller(reportCeller bool) LoggerOpt {
+	return func(l *LoggerOption) {
+		l.reportCaller = reportCeller
+	}
+}

@@ -4,9 +4,9 @@ var (
 	defaultLogPath         = "./logs"
 	defaultTimestampFormat = "2006-01-02 15:04:05.000"
 	defaultLogLevel        = DebugLevel
-	defaultReportCaller    = false
+	defaultReportCaller    = true
 	defaultShowFullLevel   = false
-	defaultShowFullPath    = false
+	defaultShowFullPath    = true
 	defaultShowStdOut      = false
 	defaultRotationCount   = 150
 	defaultRotationTime    = 86400

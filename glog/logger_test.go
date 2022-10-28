@@ -9,8 +9,8 @@ func TestLog(t *testing.T) {
 	if err := InitLogger(NewLoggerOption(o)); err != nil {
 		t.Errorf("%v", err)
 	}
-	DefaultGLog.Info("%v", "test")
-	DefaultGLog.Error("%v", "error")
-	DefaultGLog.Warn("%v", "warn")
-	DefaultGLog.Debug("%v", "debug")
+	Info("%v", "test")
+	Error("%v", "error")
+	Warn("%v", "warn")
+	Debug("%v", "debug")
 }
