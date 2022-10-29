@@ -2,10 +2,10 @@
 * 用于项目中的日志输出
 
 ## 支持
-* __WithLogPath__ 自定义日志持久化目录
-* __WithLogLevel__ 自定义日志级别
-* __WithRotationCount__ 自定义最大日志数，超过会自动删除
-* __WithRotationTime__ 自定义日志切分频率
+* __WithLogPath__ 自定义日志持久化目录，默认会在当前目录下新建logs存储。
+* __WithLogLevel__ 自定义日志级别，默认DebugLevel级别。
+* __WithRotationCount__ 自定义最大日志数，超过会自动删除。
+* __WithRotationTime__ 自定义日志切分频率。默认每天切分。
 * __WithShowStdOut__ 支持同时输出到StdOut
 * __WithReportCeller__ 输出函数调用栈
 

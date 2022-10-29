@@ -9,11 +9,12 @@ type IClientPool interface {
 	IsExist(k string) bool
 	ClearClient()
 }
+
 type ClientPool struct{}
 
 var cliPool *ClientPool
 
-func GetCliPool() *ClientPool {
+func GetCliPool() IClientPool {
 	if cliPool == nil {
 		cliPool = new(ClientPool)
 	}
