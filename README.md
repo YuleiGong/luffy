@@ -23,7 +23,7 @@
 
 ## glog
 * 基于 __logrus__ 封装的日志库。可以在项目中直接使用
-* [glog](https://github.com/YuleiGong/luffy/tree/main/g_log "glog日志库")
+* [glog](https://github.com/YuleiGong/luffy/tree/main/glog "glog日志库")
 
 
 ## task-queue
