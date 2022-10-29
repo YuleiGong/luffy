@@ -20,6 +20,10 @@ func Fatal(format string, args ...interface{}) {
 	logger.Fatalf(format, args...)
 }
 
+func Panic(format string, args ...interface{}) {
+	logger.Panicf(format, args...)
+}
+
 type LoggerOpt func(*LoggerOption)
 
 func NewLoggerOption(opts ...LoggerOpt) (l *LoggerOption) {

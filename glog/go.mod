@@ -1,6 +1,6 @@
 module glog
 
-go 1.18
+go 1.17
 
 require (
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
