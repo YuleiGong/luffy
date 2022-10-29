@@ -3,6 +3,7 @@
 * [前置](#前置)
 * [最佳实践：daemon](#daemon)
 * [最佳实践：graceful-HTTP](#graceful-HTTP)
+* [工具：hcli](#hcli)
 * [工具：glog](#glog)
 * [工具：task-queue](#task-queue)
 
@@ -24,6 +25,10 @@
 ## glog
 * 基于 __logrus__ 封装的日志库。可以在项目中直接使用
 * [glog](https://github.com/YuleiGong/luffy/tree/main/glog "glog日志库")
+
+## hcli
+* golang 发送http/https 请求工具库。
+* [hcli](https://github.com/YuleiGong/luffy/tree/main/hcli "发送http/https请求")
 
 
 ## task-queue
