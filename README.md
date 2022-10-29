@@ -28,7 +28,7 @@
 
 ## hcli
 * golang 发送http/https 请求工具库。
-* [hcli](https://github.com/YuleiGong/luffy/tree/main/hcli "发送http/https请求")
+* [hcli](https://github.com/YuleiGong/luffy/tree/main/hcli "发送http/https请求客户端")
 
 
 ## task-queue
