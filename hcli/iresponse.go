@@ -8,3 +8,7 @@ type IResponse interface {
 	GetBody() ([]byte, error)
 	GetStructBody(ptr interface{}) error
 }
+
+func NewResponse(resp *http.Response) IResponse {
+	return &Response{Response: resp}
+}

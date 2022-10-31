@@ -8,10 +8,7 @@ import (
 
 type Response struct {
 	*http.Response
-}
-
-func NewResponse(resp *http.Response) IResponse {
-	return &Response{resp}
+	body []byte
 }
 
 func (r *Response) GetStatusCode() int {
@@ -23,7 +20,15 @@ func (r *Response) GetHeader() http.Header {
 }
 
 func (r *Response) GetBody() (body []byte, err error) {
-	return ioutil.ReadAll(r.Body)
+	if r.isBody() {
+		return r.body, nil
+	}
+
+	if r.body, err = ioutil.ReadAll(r.Body); err != nil {
+		return
+	}
+
+	return r.body, err
 }
 
 //传入结构体指针
@@ -33,4 +38,8 @@ func (r *Response) GetStructBody(ptr interface{}) (err error) {
 		return
 	}
 	return json.Unmarshal(body, ptr)
+}
+
+func (r *Response) isBody() bool {
+	return len(r.body) != 0
 }

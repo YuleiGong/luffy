@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 )
 
@@ -48,23 +47,6 @@ func WithHeader(h map[string]string) RequestOpt {
 			r.header[k] = v
 		}
 	}
-}
-
-func NewRequest(method, url string, opts ...RequestOpt) (iReq IRequest) {
-	r := &Request{
-		method: strings.ToUpper(method),
-		url:    url,
-		header: make(map[string]string),
-	}
-
-	for _, opt := range opts {
-		opt(r)
-	}
-
-	iReq = r
-
-	return
-
 }
 
 func (r *Request) Do(body []byte, cli *http.Client) (resp *http.Response, err error) {
