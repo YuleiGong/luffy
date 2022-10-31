@@ -1,18 +1,20 @@
-<a name="u4qNM"></a>
 # 前置
 - golang 发送http/https最佳实践实例，基于golang自带的 **net/http** 库
 - 支持： 
    - **复用** http/https 客户端。
    - 超时控制。
    - 支持小文件上传。
-<a name="oJxUo"></a>
 # 设计思路
 
+- 功能模块：
+
+![](https://cdn.nlark.com/yuque/0/2022/jpeg/2172986/1667227641258-9755d472-e088-4621-ab75-3251281c1732.jpeg)
+
 - 设计思路：整体工具库设计，遵循了net/http的使用流程：
-   - 获取Client。
-   - 生成Request
-   - 执行请求Do
-   - 获取结果Response
+   - 通过ClientPool获取Client。
+   - 生成Request。
+   - 执行请求Do。
+   - 获取结果Response。
 - hcli 工具库所做的改变：
    - **client**:hcli 工具库，提供了线程安全的 **client_pool**，同时提供了方便的TLS客户端生成接口。
    - **Request**: hcli 工具库，封装了超时，自定义Header, 文件上传。
@@ -21,16 +23,47 @@
    - 从池子中获取 hcli 的 http client。
    - 构造出hcli 的 Resquest。
    - 根据实际需要，按需解析Response。
-<a name="BGcvg"></a>
 # 典型使用场景
-<a name="fn3Au"></a>
+
+- 执行测试案例前，先启动http测试服务
+```
+cd example/server
+go run server.go
+```
 ## 发送一个http请求
-<a name="Cgex2"></a>
+
+- 测试案例详细见 **example/http_test.go**
+```go
+//获取一个http client pool
+var cliPool hcli.IClientPool = hcli.GetClientPool()
+
+func TestSendHTTP(t *testing.T) {
+    var (
+        r    hcli.IResponse
+        err  error
+        body []byte
+    )
+    if r, err = sendHTTP(); err != nil {
+        t.Fatal(err)
+    }
+    t.Logf("%d", r.GetStatusCode())
+}
+
+func sendHTTP() (r hcli.IResponse, err error) {
+    var (
+        method = "GET"
+        url    = "http://127.0.0.1:8080/hello"
+    )
+    client := cliPool.GetOrCreateClient("http") //获取http client
+
+    var resp *http.Response //发动一个请求
+    resp, err = hcli.NewRequest(method, url).Do(hcli.NULL_BODY, client)
+
+    return hcli.NewResponse(resp), err //初始化一个Response对象，便于解析结果
+}
+```
 ## 发送一个带有超时的请求
-<a name="QcLuF"></a>
 ## 解析一个Response
-<a name="Fvw44"></a>
 ## 发送一个https请求
-<a name="TXqzj"></a>
 ## 上传一个文件
 

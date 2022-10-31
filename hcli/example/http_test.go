@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+//获取一个http client pool
 var cliPool hcli.IClientPool = hcli.GetClientPool()
 
 type Resp struct {
@@ -42,10 +43,10 @@ func sendHTTP() (r hcli.IResponse, err error) {
 		method = "GET"
 		url    = "http://127.0.0.1:8080/hello"
 	)
-	client := cliPool.GetOrCreateClient("http")
+	client := cliPool.GetOrCreateClient("http") //获取http client
 
-	var resp *http.Response
+	var resp *http.Response //发动一个请求
 	resp, err = hcli.NewRequest(method, url).Do(hcli.NULL_BODY, client)
 
-	return hcli.NewResponse(resp), err
+	return hcli.NewResponse(resp), err //初始化一个Response对象，便于解析结果
 }
