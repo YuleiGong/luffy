@@ -7,6 +7,9 @@
 # 设计思路
 
 - 功能模块：
+   - **IClientPool**：封装了http client连接池相关接口。
+   - **IRequest**: 封装了发送请求的接口，目前只有Do接口。
+   - **IResponse**: 封装了解析Response的相关接口。
 
 ![](https://cdn.nlark.com/yuque/0/2022/jpeg/2172986/1667227641258-9755d472-e088-4621-ab75-3251281c1732.jpeg)
 
