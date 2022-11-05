@@ -22,6 +22,7 @@ func TestSendHTTP(t *testing.T) {
 	if r, err = sendHTTP(); err != nil {
 		t.Fatal(err)
 	}
+	defer r.Close()
 	t.Logf("%d", r.GetStatusCode())
 	t.Logf("%v", r.GetHeader())
 
@@ -45,7 +46,7 @@ func sendHTTP() (r hcli.IResponse, err error) {
 	)
 	client := cliPool.GetOrCreateClient("http") //获取http client
 
-	var resp *http.Response //发动一个请求
+	var resp *http.Response //发发送一个请求
 	resp, err = hcli.NewRequest(method, url).Do(hcli.NULL_BODY, client)
 
 	return hcli.NewResponse(resp), err //初始化一个Response对象，便于解析结果

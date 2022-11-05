@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,6 +10,7 @@ import (
 func InitServer() *http.Server {
 	router := gin.Default()
 	router.GET("/hello", handler)
+	router.GET("/timeout", timeoutHandler)
 
 	srv := &http.Server{
 		Addr:    ":8080",
@@ -26,6 +28,14 @@ func handler(c *gin.Context) {
 	c.JSON(http.StatusOK, Resp{
 		Result: "hello world",
 	})
+}
+
+func timeoutHandler(c *gin.Context) {
+	time.Sleep(3 * time.Second)
+	c.JSON(http.StatusOK, Resp{
+		Result: "hello world",
+	})
+
 }
 
 func main() {

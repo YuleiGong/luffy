@@ -19,7 +19,7 @@
    - 执行请求Do。
    - 获取结果Response。
 - hcli 工具库所做的改变：
-   - **client**:hcli 工具库，提供了线程安全的 **client_pool**，同时提供了方便的TLS客户端生成接口。
+   - **client**:hcli 工具库，提供了线程安全的 **client_pool**，同时提供了TLS客户端生成接口。
    - **Request**: hcli 工具库，封装了超时，自定义Header, 文件上传。
    - **Response**: hcli 工具库，对Response 提供了结构化和非结构化的body获取接口，提供了header获取接口，提供了StatusCode获取接口。
 - 三步走，即可完成一个http/https 请求的发送：

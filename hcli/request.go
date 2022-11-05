@@ -54,6 +54,11 @@ func (r *Request) Do(body []byte, cli *http.Client) (resp *http.Response, err er
 	if req, err = r.wrapRequest(body); err != nil {
 		return
 	}
+	if r.isTimeout() {
+		var cancel context.CancelFunc
+		cancel, req = r.wrapTimeoutRequest(req)
+		defer cancel()
+	}
 
 	return cli.Do(req)
 }
@@ -79,12 +84,6 @@ func (r *Request) wrapRequest(body []byte) (req *http.Request, err error) {
 	if err != nil {
 		return
 	}
-
-	if r.isTimeout() {
-		cancel := r.wrapTimeoutRequest(req)
-		defer cancel()
-	}
-
 	if r.isHeader() {
 		r.wrapHeaderRequest(req)
 	}
@@ -119,9 +118,7 @@ func (r *Request) wrapHeaderRequest(req *http.Request) {
 	}
 }
 
-func (r *Request) wrapTimeoutRequest(req *http.Request) context.CancelFunc {
+func (r *Request) wrapTimeoutRequest(req *http.Request) (context.CancelFunc, *http.Request) {
 	ctx, cancel := context.WithTimeout(context.TODO(), r.timeout)
-	req = req.WithContext(ctx)
-
-	return cancel
+	return cancel, req.WithContext(ctx)
 }

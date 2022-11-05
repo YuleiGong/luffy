@@ -43,3 +43,7 @@ func (r *Response) GetStructBody(ptr interface{}) (err error) {
 func (r *Response) isBody() bool {
 	return len(r.body) != 0
 }
+
+func (r *Response) Close() {
+	r.Body.Close()
+}

@@ -7,6 +7,7 @@ type IResponse interface {
 	GetHeader() http.Header
 	GetBody() ([]byte, error)
 	GetStructBody(ptr interface{}) error
+	Close()
 }
 
 func NewResponse(resp *http.Response) IResponse {
