@@ -1,10 +1,10 @@
-# 1 前置
+# 前置
 - golang 发送http/https最佳实践实例，基于golang自带的 **net/http** 库
 - 支持： 
    - **复用** http/https 客户端。
    - 超时控制。
    - 支持小文件上传。
-# 2 设计思路
+# 设计思路
 
 - 功能模块：
    - **IClientPool**：封装了http client连接池相关接口。
@@ -26,7 +26,7 @@
    - 从池子中获取 hcli 的 http client。
    - 构造出hcli 的 Resquest。
    - 根据实际需要，按需解析Response。
-# 2 典型使用场景
+# 典型使用场景
 
 - 执行测试案例前，先启动http测试服务
 ```go
@@ -39,7 +39,7 @@ go run server.go
 cd example/https_server
 go run server.go
 ```
-## 2.1 发送一个http请求
+## 发送一个http请求
 
 - 测试案例详细见 **example/http_test.go**
 ```go
@@ -72,7 +72,7 @@ func sendHTTP() (r hcli.IResponse, err error) {
     return hcli.NewResponse(resp), err //初始化一个Response对象，便于解析结果
 }
 ```
-## 2.2 发送一个带有超时退出请求
+## 发送一个带有超时退出请求
 
 - 测试案例详见 **example/http_timeout_test.go**
 ```go
@@ -105,7 +105,7 @@ func sendTimeoutHTTP() (r hcli.IResponse, err error) {
 	return hcli.NewResponse(resp), err //初始化一个Response对象，便于解析结果
 }
 ```
-## 2.3 解析一个Response
+## 解析一个Response
 
 - 测试案例详见 **example/http_parse_test.go**
 ```go
@@ -146,7 +146,7 @@ func sendHTTP() (r hcli.IResponse, err error) {
 	return hcli.NewResponse(resp), err //初始化一个Response对象，便于解析结果
 }
 ```
-## 2.4 发送一个https请求
+## 发送一个https请求
 
 - 客户端携带CA证书访问HTTPS服务端。测试案例详见 **example/https_test.go。**
 - 测试证书存放在example/cert目录中。
@@ -186,5 +186,48 @@ func sendHTTPS() (r hcli.IResponse, err error) {
 	return hcli.NewResponse(resp), err //初始化一个Response对象，便于解析结果
 }
 ```
-## 2.4 上传一个文件
+## 上传一个文件
+
+- 支持上传一个小文件到服务端。测试案例详见 **example/http_upload_test.go**
+```go
+var cliPool hcli.IClientPool = hcli.GetClientPool()
+
+type Resp struct {
+	Result string `json:"result"`
+}
+
+func TestUpload(t *testing.T) {
+	var (
+		r    hcli.IResponse
+		err  error
+		body []byte
+	)
+	if r, err = sendHTTP(); err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+
+	if body, err = r.GetBody(); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("%s", string(body))
+
+}
+
+func sendHTTP() (r hcli.IResponse, err error) {
+	var (
+		method = "GET"
+		url    = "http://127.0.0.1:8080/upload"
+	)
+
+	client := cliPool.GetOrCreateClient("upload")
+	file := "upload.txt"
+	field := "upload"
+
+	var resp *http.Response //发发送一个请求
+	resp, err = hcli.NewRequest(method, url, hcli.WithUploadFile(file, field)).Do(hcli.NULL_BODY, client)
+
+	return hcli.NewResponse(resp), err //初始化一个Response对象，便于解析结果
+}
+```
 
