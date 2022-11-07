@@ -1,6 +1,10 @@
 package un_pack
 
-type IUnPack interface{}
+import "gudp/message"
+
+type IUnPack interface {
+	UnPack() message.Message
+}
 
 func NewUnPack() IUnPack {
 	return &UnPack{}

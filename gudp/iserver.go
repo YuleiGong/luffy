@@ -1,20 +1,20 @@
 package gudp
 
 import (
+	"gudp/handler"
 	"gudp/un_pack"
 	"sync"
 )
 
 type IServer interface {
-	Listen() error
-	Start()
+	Start() error
 }
 
 type ServerOpt func(*Server)
 
 func WithReadBuffSize(size int) ServerOpt {
 	return func(s *Server) {
-		s.readBuffSiziue = size
+		s.readBuffSize = size
 	}
 }
 
@@ -24,10 +24,10 @@ func WithReceiveChannelSize(size int) ServerOpt {
 	}
 }
 
-func NewServer(handler handler.IHanlder, unPack un_pack.IUnPack, opts ...ServerOpt) IServer {
+func NewServer(h handler.IHandler, p un_pack.IUnPack, opts ...ServerOpt) IServer {
 	s := &Server{
-		handler:      handler,
-		unPack:       unPack,
+		handler:      h,
+		unPack:       p,
 		readBuffSize: defaultReadBuffSize,
 		datagramPool: sync.Pool{
 			New: func() interface{} {
