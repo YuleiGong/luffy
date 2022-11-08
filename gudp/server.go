@@ -1,26 +1,78 @@
 package gudp
 
 import (
+	"gudp/codec"
 	"gudp/handler"
-	"gudp/un_pack"
 	"net"
-	"sync"
 )
 
 type Server struct {
-	addr            string    //地址
-	datagramPool    sync.Pool //byte对象池
-	receiveChanSize int       //数据接收channel size
+	addr            string //地址
+	receiveChanSize int    //数据接收channel size
 	readBuffSize    int
-	handler         handler.IHandler //数据逻辑处理
-	unPack          un_pack.IUnPack  //数据解包
+	codec           codec.ICodec     //数据编解码
+	handler         handler.IHandler //数据的处理逻辑
 }
 
 const (
 	defaultReadBuffSize    = 64 * 1024
 	defaultReceiveChanSize = 10
-	datagramPoolSize       = 65536
 )
+
+type ServerOpt func(*Server)
+
+func WithReadBuffSize(size int) ServerOpt {
+	return func(s *Server) {
+		s.readBuffSize = size
+	}
+}
+
+func WithReceiveChanSize(size int) ServerOpt {
+	return func(s *Server) {
+		s.receiveChanSize = size
+	}
+}
+
+func NewServer(addr string, opts ...ServerOpt) *Server {
+	s := &Server{
+		addr:            addr,
+		receiveChanSize: defaultReceiveChanSize,
+		readBuffSize:    defaultReadBuffSize,
+	}
+
+	for _, opt := range opts {
+		opt(s)
+	}
+
+	return s
+}
+
+func (s *Server) RegisterHandler(h handler.IHandler) {
+	s.handler = h
+}
+
+func (s *Server) RegisterCodec(c codec.ICodec) {
+	s.codec = c
+}
+
+func (s *Server) Start() (err error) {
+	var conn *net.UDPConn
+	if conn, err = s.listen(); err != nil {
+		return
+	}
+	if !s.isHandler() {
+		return err
+	}
+
+	if !s.isCodec() {
+		return err
+	}
+	c := NewConn(s, conn)
+	c.Do()
+	c.Wait()
+
+	return nil
+}
 
 func (s *Server) listen() (conn *net.UDPConn, err error) {
 	var addr *net.UDPAddr
@@ -36,27 +88,18 @@ func (s *Server) listen() (conn *net.UDPConn, err error) {
 	return conn, nil
 }
 
-func (s *Server) Start() (err error) {
-	var conn *net.UDPConn
-	if conn, err = s.listen(); err != nil {
-		return
-	}
-	if !s.isHandler() {
-		return err
-	}
-
-	if !s.isUnPack() {
-		return err
-	}
-	c := NewConn(s, conn, s.handler, s.unPack)
-	c.Do()
-	c.Wait()
-}
-
 func (s *Server) isHandler() bool {
 	return s.handler != nil
 }
 
-func (s *Server) isUnPack() bool {
-	return s.unPack != nil
+func (s *Server) isCodec() bool {
+	return s.codec != nil
+}
+
+func (s *Server) GetHandler() handler.IHandler {
+	return s.handler
+}
+
+func (s *Server) GetCodec() codec.ICodec {
+	return s.codec
 }

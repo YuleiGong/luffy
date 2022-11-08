@@ -1,9 +1,7 @@
 package gudp
 
 import (
-	"gudp/handler"
 	"gudp/message"
-	"gudp/un_pack"
 	"net"
 	"sync"
 	"time"
@@ -12,28 +10,33 @@ import (
 type Conn struct {
 	svr         *Server
 	conn        *net.UDPConn
-	receiveChan chan message.Message //channel定义
+	receiveChan chan *message.Message //channel定义
 	wait        sync.WaitGroup
-	handler     handler.IHandler //数据逻辑处理
-	unPack      un_pack.IUnPack  //数据解包
+}
+
+func NewConn(svr *Server, conn *net.UDPConn) *Conn {
+	return &Conn{
+		svr:         svr,
+		conn:        conn,
+		receiveChan: make(chan *message.Message, svr.receiveChanSize),
+	}
 }
 
 //reveive
 //handler
 func (c *Conn) Do() {
+	c.receiveMessage()
+	c.handler()
 
 }
 
-func (c *Conn) close() {
-}
-
+//接收消息 解包
 func (c *Conn) receiveMessage() {
 	c.wait.Add(1)
 	go func() {
 		defer c.wait.Done()
 		for {
-			buf := c.svr.datagramPool.Get().([]byte)
-			n, addr, err := c.conn.ReadFrom(buf)
+			msg, err := c.svr.GetCodec().Decode(c.conn)
 			if err != nil {
 				opError, ok := err.(*net.OpError)
 				if (ok) && !opError.Temporary() && !opError.Timeout() {
@@ -41,23 +44,23 @@ func (c *Conn) receiveMessage() {
 				}
 				time.Sleep(10 * time.Millisecond)
 			}
-			//解包 放入receiveMessage
+			c.receiveChan <- msg
 		}
 	}()
 }
 
+//消息handler
 func (c *Conn) handler() {
 	c.wait.Add(1)
 	go func() {
 		defer c.wait.Done()
 		for {
 			select {
-			case msg, ok := (<-c.receiveMessage):
+			case msg, ok := (<-c.receiveChan):
 				if !ok {
 					return
 				}
-				go c.handler.Do(msg) //执行业务处理函数
-				c.svr.datagramPool.Put(msg.message[:cap(msg.message)])
+				go c.svr.GetHandler().Do(msg) //执行业务处理函数
 			}
 		}
 	}()
