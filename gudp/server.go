@@ -1,6 +1,7 @@
 package gudp
 
 import (
+	"fmt"
 	"gudp/codec"
 	"gudp/handler"
 	"net"
@@ -10,12 +11,14 @@ type Server struct {
 	addr            string //地址
 	receiveChanSize int    //数据接收channel size
 	readBuffSize    int
+	stopped         bool
 	codec           codec.ICodec     //数据编解码
 	handler         handler.IHandler //数据的处理逻辑
 }
 
 const (
 	defaultReadBuffSize    = 64 * 1024
+	defaultSendChanSize    = 10
 	defaultReceiveChanSize = 10
 )
 
@@ -70,6 +73,7 @@ func (s *Server) Start() (err error) {
 	c := NewConn(s, conn)
 	c.Do()
 	c.Wait()
+	defer conn.Close()
 
 	return nil
 }
@@ -83,7 +87,9 @@ func (s *Server) listen() (conn *net.UDPConn, err error) {
 	if conn, err = net.ListenUDP("udp", addr); err != nil {
 		return
 	}
-	conn.SetReadBuffer(s.readBuffSize)
+	if err = conn.SetReadBuffer(s.readBuffSize); err != nil {
+		return
+	}
 
 	return conn, nil
 }
@@ -102,4 +108,13 @@ func (s *Server) GetHandler() handler.IHandler {
 
 func (s *Server) GetCodec() codec.ICodec {
 	return s.codec
+}
+
+func (s *Server) Stop() {
+	fmt.Println("**************************")
+	s.stopped = true
+}
+
+func (s *Server) isStopped() bool {
+	return s.stopped
 }

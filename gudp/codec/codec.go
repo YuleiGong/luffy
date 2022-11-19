@@ -7,7 +7,6 @@ import (
 
 type Codec struct{}
 
-//数据解包
 func (u *Codec) Decode(conn *net.UDPConn) (msg *message.Message, err error) {
 	var (
 		buf  []byte

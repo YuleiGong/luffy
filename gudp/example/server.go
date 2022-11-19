@@ -5,6 +5,9 @@ import (
 	"gudp"
 	"gudp/message"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 type LogCodec struct{}
@@ -31,7 +34,16 @@ func main() {
 	s := gudp.NewServer(addr)
 	s.RegisterHandler(LogHandler{})
 	s.RegisterCodec(LogCodec{})
-	if err := s.Start(); err != nil {
-		fmt.Println(err)
-	}
+
+	go func() {
+		if err := s.Start(); err != nil {
+			fmt.Println(err)
+			return
+		}
+	}()
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+	<-sigCh
+	s.Stop()
 }
