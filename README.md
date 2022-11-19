@@ -5,7 +5,6 @@
 * [最佳实践：graceful-HTTP](#graceful-HTTP)
 * [工具：hcli](#hcli)
 * [工具：glog](#glog)
-* [工具：task-queue](#task-queue)
 
 ## 前置
 
@@ -29,13 +28,4 @@
 ## hcli
 * golang 发送http/https 请求工具库。
 * [hcli](https://github.com/YuleiGong/luffy/tree/main/hcli "发送http/https请求客户端")
-
-
-## task-queue
-
-* golang 编码的类似 python __Celery__ 单节点异步任务队列。
-* 支持：
-    * 任务重试
-    * 设置任务超时
-    * 任务执行状态查询
 
